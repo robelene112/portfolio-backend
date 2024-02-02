@@ -1,28 +1,41 @@
 use axum::{
     routing::get,
-    response::Html,
+    response::{Html, IntoResponse},
     Router,
+    http::header
 };
 
 #[tokio::main]
 async fn main() {
-    // build our application with a single route
+    // build our application 
     let app = Router::new()
-        .route("/", get(root));
-        // .route("/styles", get(styles));
+        .route("/", get(root))
+        .route("/reset", get(reset_styles))
+        .route("/styles", get(desktop_styles))
+        .route("/mobile", get(mobile_styles))
+        .route("/main", get(main_js));
 
     // run our app with hyper, listening globally on port 3000 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
     axum::serve(listener, app).await.unwrap();
 }
 
-async fn root() -> Html<String> {
-    let index_html = tokio::fs::read_to_string("src/index.html").await.unwrap();
-    Html(index_html)
+async fn root() -> Html<&'static str> { 
+    Html(include_str!("../static/index.html"))
 }
 
-/*
-async fn styles () {
-
+async fn desktop_styles() -> impl IntoResponse  {
+    ([(header::CONTENT_TYPE, "text/css")], include_str!("../static/styles.css"))
 }
-*/
+
+async fn mobile_styles() -> impl IntoResponse {
+    ([(header::CONTENT_TYPE, "text/css")], include_str!("../static/mobile.css"))
+}
+
+async fn main_js() -> impl IntoResponse {
+    ([(header::CONTENT_TYPE, "text/css")], include_str!("../static/main.js"))
+}
+
+async fn reset_styles() -> impl IntoResponse {
+    ([(header::CONTENT_TYPE, "text/css")], include_str!("../static/reset.css"))
+}
