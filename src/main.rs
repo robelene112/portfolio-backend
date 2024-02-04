@@ -20,22 +20,27 @@ async fn main() {
     axum::serve(listener, app).await.unwrap();
 }
 
-async fn root() -> Html<&'static str> { 
-    Html(include_str!("../static/index.html"))
+async fn root() -> Html<String> { 
+    let html = tokio::fs::read_to_string("static/index.html").await.unwrap();
+    Html(html)
 }
 
 async fn desktop_styles() -> impl IntoResponse  {
-    ([(header::CONTENT_TYPE, "text/css")], include_str!("../static/styles.css"))
+    let css = tokio::fs::read_to_string("static/styles.css").await.unwrap();
+    ([(header::CONTENT_TYPE, "text/css")], css)
 }
 
 async fn mobile_styles() -> impl IntoResponse {
-    ([(header::CONTENT_TYPE, "text/css")], include_str!("../static/mobile.css"))
+    let css = tokio::fs::read_to_string("static/mobile.css").await.unwrap();
+    ([(header::CONTENT_TYPE, "text/css")], css)
 }
 
 async fn main_js() -> impl IntoResponse {
-    ([(header::CONTENT_TYPE, "text/css")], include_str!("../static/main.js"))
+    let js = tokio::fs::read_to_string("static/main.js").await.unwrap();
+    ([(header::CONTENT_TYPE, "text/javascript")], js)
 }
 
 async fn reset_styles() -> impl IntoResponse {
-    ([(header::CONTENT_TYPE, "text/css")], include_str!("../static/reset.css"))
+    let css = tokio::fs::read_to_string("static/reset.css").await.unwrap();
+    ([(header::CONTENT_TYPE, "text/css")], css)
 }
